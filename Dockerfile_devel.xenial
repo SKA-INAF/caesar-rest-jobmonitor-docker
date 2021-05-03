@@ -1,0 +1,23 @@
+FROM sriggi/caesar-rest:devel
+
+MAINTAINER Simone Riggi "simone.riggi@gmail.com"
+
+######################################
+##   DEFINE CUSTOMIZABLE ARGS/ENVS
+######################################
+# ...
+# ...
+
+
+######################################
+##     RUN
+######################################
+# - Copy run script
+COPY run_jobmonitor.sh /opt/caesar-rest/bin/run_jobmonitor.sh
+RUN chmod +x /opt/caesar-rest/bin/run_jobmonitor.sh
+
+# - Run 
+CMD ["/opt/caesar-rest/bin/run_jobmonitor.sh --runuser=$USER --job-monitoring-period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbport=$DBPORT --dbname=$DBNAME --job-scheduler=$JOB_SCHEDULER --kube-incluster=$KUBE_INCLUSTER --kube-config=$KUBE_CONFIG --kube-cafile=$KUBE_CAFILE --kube-keyfile=$KUBE_KEYFILE --kube-certfile=$KUBE_CERTFILE"]
+
+
+
