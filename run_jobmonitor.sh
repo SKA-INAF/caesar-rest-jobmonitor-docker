@@ -27,8 +27,7 @@ SLURM_KEYFILE=""
 SLURM_USER=""
 SLURM_HOST=""
 SLURM_PORT=""
-SLURM_BATCH_WORKDIR=""
-SLURM_QUEUE=""
+
 
 echo "ARGS: $@"
 
@@ -98,12 +97,7 @@ do
 		--slurm-port=*)
     	SLURM_PORT=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
     ;;
-		--slurm-batch-workdir=*)
-    	SLURM_BATCH_WORKDIR=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
-		--slurm-queue=*)
-    	SLURM_QUEUE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
+		
 
 	*)
     # Unknown option
@@ -237,7 +231,7 @@ if [ "$KUBE_INCLUSTER" = "1" ] ; then
 fi
 KUBE_OPTS="$KUBE_OPTS --kube_config=$KUBE_CONFIG --kube_cafile=$KUBE_CAFILE --kube_keyfile=$KUBE_KEYFILE --kube_certfile=$KUBE_CERTFILE"
 
-SLURM_OPTS="--slurm_keyfile=$SLURM_KEYFILE --slurm_user=$SLURM_USER --slurm_host=$SLURM_HOST --slurm_port=$SLURM_PORT --slurm_batch_workdir=$SLURM_BATCH_WORKDIR --slurm_queue=$SLURM_QUEUE "
+SLURM_OPTS="--slurm_keyfile=$SLURM_KEYFILE --slurm_user=$SLURM_USER --slurm_host=$SLURM_HOST --slurm_port=$SLURM_PORT "
 
 ###############################
 ##    RUN JOB MONITOR
