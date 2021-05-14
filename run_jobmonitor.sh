@@ -10,16 +10,25 @@ DBNAME="caesardb"
 DBPORT=27017
 JOB_MONITORING_PERIOD=30
 JOB_SCHEDULER="kubernetes"
-KUBE_INCLUSTER=1
-KUBE_CONFIG=""
-KUBE_CAFILE=""
-KUBE_KEYFILE=""
-KUBE_CERTFILE=""
+
 MOUNT_RCLONE_VOLUME=0
 MOUNT_VOLUME_PATH="/mnt/storage"
 RCLONE_REMOTE_STORAGE="neanias-nextcloud"
 RCLONE_REMOTE_STORAGE_PATH="."
 RCLONE_MOUNT_WAIT_TIME=10
+
+KUBE_INCLUSTER=1
+KUBE_CONFIG=""
+KUBE_CAFILE=""
+KUBE_KEYFILE=""
+KUBE_CERTFILE=""
+
+SLURM_KEYFILE=""
+SLURM_USER=""
+SLURM_HOST=""
+SLURM_PORT=""
+SLURM_BATCH_WORKDIR=""
+SLURM_QUEUE=""
 
 echo "ARGS: $@"
 
@@ -44,21 +53,7 @@ do
 		--job-scheduler=*)
     	JOB_SCHEDULER=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
     ;;
-		--kube-incluster=*)
-    	KUBE_INCLUSTER=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;	
-		--kube-config=*)
-    	KUBE_CONFIG=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
-		--kube-cafile=*)
-    	KUBE_CAFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
-		--kube-keyfile=*)
-    	KUBE_KEYFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
-		--kube-certfile=*)
-    	KUBE_CERTFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
-    ;;
+		
 		--mount-rclone-volume=*)
     	MOUNT_RCLONE_VOLUME=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
     ;;
@@ -74,6 +69,42 @@ do
 		--rclone-mount-wait=*)
     	RCLONE_MOUNT_WAIT_TIME=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
     ;;
+
+    --kube-incluster=*)
+    	KUBE_INCLUSTER=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;	
+		--kube-config=*)
+    	KUBE_CONFIG=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--kube-cafile=*)
+    	KUBE_CAFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--kube-keyfile=*)
+    	KUBE_KEYFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--kube-certfile=*)
+    	KUBE_CERTFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+
+    --slurm-keyfile=*)
+    	SLURM_KEYFILE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--slurm-user=*)
+    	SLURM_USER=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--slurm-host=*)
+    	SLURM_HOST=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--slurm-port=*)
+    	SLURM_PORT=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--slurm-batch-workdir=*)
+    	SLURM_BATCH_WORKDIR=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+		--slurm-queue=*)
+    	SLURM_QUEUE=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+
 	*)
     # Unknown option
     echo "ERROR: Unknown option ($item)...exit!"
@@ -130,8 +161,8 @@ fi
 ###############################
 ##    SET KUBE CONFIG
 ###############################
-if [ "$KUBE_INCLUSTER" = "0" ] ; then
-	
+if [ "$JOB_SCHEDULER" = "kubernetes" ] && [ "$KUBE_INCLUSTER" = "0" ] ; then
+
 	echo "INFO: Creating kube config dir in /home/$RUNUSER ..."
 	KUBE_CONFIG_TOP_DIR="/home/$RUNUSER/.kube"
 	mkdir -p "$KUBE_CONFIG_TOP_DIR"
@@ -206,12 +237,13 @@ if [ "$KUBE_INCLUSTER" = "1" ] ; then
 fi
 KUBE_OPTS="$KUBE_OPTS --kube_config=$KUBE_CONFIG --kube_cafile=$KUBE_CAFILE --kube_keyfile=$KUBE_KEYFILE --kube_certfile=$KUBE_CERTFILE"
 
+SLURM_OPTS="--slurm_keyfile=$SLURM_KEYFILE --slurm_user=$SLURM_USER --slurm_host=$SLURM_HOST --slurm_port=$SLURM_PORT --slurm_batch_workdir=$SLURM_BATCH_WORKDIR --slurm_queue=$SLURM_QUEUE "
 
 ###############################
 ##    RUN JOB MONITOR
 ###############################
 # - Define run command & args
-CMD="runuser -l $RUNUSER -g $RUNUSER -c'""/opt/caesar-rest/bin/run_jobmonitor.py --job_monitoring_period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbname=$DBNAME --dbport=$DBPORT $JOB_SCHEDULER_OPT $KUBE_OPTS ""'"
+CMD="runuser -l $RUNUSER -g $RUNUSER -c'""/opt/caesar-rest/bin/run_jobmonitor.py --job_monitoring_period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbname=$DBNAME --dbport=$DBPORT $JOB_SCHEDULER_OPT $KUBE_OPTS $SLURM_OPTS ""'"
 
 # - Run command
 echo "INFO: Running command: $CMD ..."

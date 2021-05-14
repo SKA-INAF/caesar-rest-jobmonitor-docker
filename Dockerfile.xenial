@@ -17,7 +17,7 @@ COPY run_jobmonitor.sh /opt/caesar-rest/bin/run_jobmonitor.sh
 RUN chmod +x /opt/caesar-rest/bin/run_jobmonitor.sh
 
 # - Run 
-CMD ["sh", "-c", "/opt/caesar-rest/bin/run_jobmonitor.sh --runuser=$USER --job-monitoring-period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbport=$DBPORT --dbname=$DBNAME --job-scheduler=$JOB_SCHEDULER --kube-incluster=$KUBE_INCLUSTER --kube-config=$KUBE_CONFIG --kube-cafile=$KUBE_CAFILE --kube-keyfile=$KUBE_KEYFILE --kube-certfile=$KUBE_CERTFILE --mount-rclone-volume=$MOUNT_RCLONE_VOLUME --mount-volume-path=$MOUNT_VOLUME_PATH --rclone-remote-storage=$RCLONE_REMOTE_STORAGE --rclone-remote-storage-path=$RCLONE_REMOTE_STORAGE_PATH --rclone-mount-wait=$RCLONE_MOUNT_WAIT_TIME"]
+CMD ["sh", "-c", "/opt/caesar-rest/bin/run_jobmonitor.sh --runuser=$USER --job-monitoring-period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbport=$DBPORT --dbname=$DBNAME --job-scheduler=$JOB_SCHEDULER --mount-rclone-volume=$MOUNT_RCLONE_VOLUME --mount-volume-path=$MOUNT_VOLUME_PATH --rclone-remote-storage=$RCLONE_REMOTE_STORAGE --rclone-remote-storage-path=$RCLONE_REMOTE_STORAGE_PATH --rclone-mount-wait=$RCLONE_MOUNT_WAIT_TIME --kube-incluster=$KUBE_INCLUSTER --kube-config=$KUBE_CONFIG --kube-cafile=$KUBE_CAFILE --kube-keyfile=$KUBE_KEYFILE --kube-certfile=$KUBE_CERTFILE --slurm-keyfile=$SLURM_KEYFILE --slurm-user=$SLURM_USER --slurm-host=$SLURM_HOST --slurm-port=$SLURM_PORT --slurm-batch-workdir=$SLURM_BATCH_WORKDIR --slurm-queue=$SLURM_QUEUE"]
 
 
 
