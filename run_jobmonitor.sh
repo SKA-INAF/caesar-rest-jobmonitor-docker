@@ -4,6 +4,7 @@
 ##    PARSE ARGS
 ##########################
 RUNUSER="caesar"
+CHANGE_USER=true
 RUNSCRIPT="/opt/caesar-rest/bin/run_jobmonitor.py"
 DBHOST="127.0.0.1"
 DBNAME="caesardb"
@@ -36,6 +37,14 @@ do
 	case $item in
 		--runuser=*)
     	RUNUSER=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+    ;;
+    --change-runuser=*)
+    	CHANGE_USER_FLAG=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
+			if [ "$CHANGE_USER_FLAG" = "1" ] ; then
+				CHANGE_USER=true
+			else
+				CHANGE_USER=false
+			fi
     ;;
 		--job-monitoring-period=*)
     	JOB_MONITORING_PERIOD=`echo $item | /bin/sed 's/[-a-zA-Z0-9]*=//'`
@@ -237,7 +246,13 @@ SLURM_OPTS="--slurm_keyfile=$SLURM_KEYFILE --slurm_user=$SLURM_USER --slurm_host
 ##    RUN JOB MONITOR
 ###############################
 # - Define run command & args
-CMD="runuser -l $RUNUSER -g $RUNUSER -c'""/opt/caesar-rest/bin/run_jobmonitor.py --job_monitoring_period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbname=$DBNAME --dbport=$DBPORT $JOB_SCHEDULER_OPT $KUBE_OPTS $SLURM_OPTS ""'"
+
+if [ "$CHANGE_USER" = true ]; then
+	CMD="runuser -l $RUNUSER -g $RUNUSER -c'""/opt/caesar-rest/bin/run_jobmonitor.py --job_monitoring_period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbname=$DBNAME --dbport=$DBPORT $JOB_SCHEDULER_OPT $KUBE_OPTS $SLURM_OPTS ""'"
+else
+	CMD="python /opt/caesar-rest/bin/run_jobmonitor.py --job_monitoring_period=$JOB_MONITORING_PERIOD --dbhost=$DBHOST --dbname=$DBNAME --dbport=$DBPORT $JOB_SCHEDULER_OPT $KUBE_OPTS $SLURM_OPTS"
+fi
+
 
 # - Run command
 echo "INFO: Running command: $CMD ..."
